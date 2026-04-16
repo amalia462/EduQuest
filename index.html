@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduQuest – Platform Gamifikasi Pendidikan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   ROOT & RESET
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0A0F1E;
+  --surface: #111827;
+  --surf2:   #1C2537;
+  --surf3:   #243044;
+  --accent:  #4FFFB0;
+  --purple:  #7B61FF;
+  --gold:    #FFD166;
+  --red:     #FF6B6B;
+  --text:    #F0F4FF;
+  --muted:   #8892A4;
+  --border:  rgba(255,255,255,0.07);
+  --r:       14px;
+  --sidebar: 230px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* PAGE SYSTEM */
+.page { display: none; min-height: 100vh; }
+.page.active { display: flex; }
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%,100% { transform: translate(0,0); }
+  50%      { transform: translate(15px,-15px); }
+}
+@keyframes pulse2 { 0%,100%{opacity:1} 50%{opacity:.4} }
+@keyframes slideIn { from{transform:translateX(-100%)} to{transform:translateX(0)} }
+
+.fade-up { animation: fadeUp .5s cubic-bezier(.16,1,.3,1) both; }
+
+/* ═══════════════════════════════════════════
+   ① LOGIN PAGE
+═══════════════════════════════════════════ */
+#page-login {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.orb {
+  position: fixed; border-radius: 50%;
+  filter: blur(80px); opacity: .12;
+  animation: float 8s ease-in-out infinite;
+  pointer-events: none;
+}
+.orb1 { width:400px;height:400px;background:#4FFFB0;top:-100px;left:-100px;animation-delay:0s; }
+.orb2 { width:300px;height:300px;background:#7B61FF;bottom:-80px;right:-80px;animation-delay:3s; }
+.orb3 { width:200px;height:200px;background:#FF6B6B;top:50%;left:60%;animation-delay:5s; }
+
+body::before {
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;z-index:0;
+}
+
+.login-wrapper {
+  display:flex;width:900px;max-width:95vw;min-height:560px;
+  background:var(--surface);border-radius:24px;border:1px solid var(--border);
+  overflow:hidden;position:relative;z-index:1;
+  animation:fadeUp .6s cubic-bezier(.16,1,.3,1) both;
+}
+
+.brand-panel {
+  flex:1;background:linear-gradient(135deg,#0D1B2A,#1A1040);
+  padding:48px;display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.brand-panel::before {
+  content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+  border-radius:50%;background:radial-gradient(circle,rgba(79,255,176,.2),transparent 70%);
+}
+.logo-mark { display:flex;align-items:center;gap:12px; }
+.logo-icon {
+  width:42px;height:42px;background:var(--accent);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#0A0F1E;
+}
+.logo-text { font-family:'Syne',sans-serif;font-weight:700;font-size:22px; }
+.brand-tagline { margin-top:auto; }
+.brand-tagline h1 {
+  font-family:'Syne',sans-serif;font-size:34px;font-weight:800;
+  line-height:1.15;margin-bottom:16px;letter-spacing:-1px;
+}
+.brand-tagline h1 span { color:var(--accent); }
+.brand-tagline p { color:var(--muted);font-size:14px;line-height:1.6; }
+.stats-row { display:flex;gap:24px;margin-top:32px; }
+.stat-num { font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--accent); }
+.stat-label { font-size:12px;color:var(--muted);margin-top:2px; }
+
+.form-panel { width:380px;padding:48px 40px;display:flex;flex-direction:column;justify-content:center; }
+.form-title { font-family:'Syne',sans-serif;font-size:26px;font-weight:700;margin-bottom:6px; }
+.form-subtitle { color:var(--muted);font-size:14px;margin-bottom:32px; }
+
+.role-tabs { display:flex;gap:8px;margin-bottom:28px;background:var(--surf2);padding:4px;border-radius:12px; }
+.role-tab {
+  flex:1;padding:10px;border:none;background:transparent;color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;border-radius:8px;cursor:pointer;transition:all .2s;
+}
+.role-tab.active { background:var(--accent);color:#0A0F1E; }
+
+.field { margin-bottom:16px; }
+.field label { display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px; }
+.field input {
+  width:100%;padding:12px 16px;background:var(--surf2);border:1px solid var(--border);
+  border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .2s;
+}
+.field input:focus { border-color:var(--accent); }
+
+.btn-login {
+  width:100%;padding:14px;margin-top:8px;background:var(--accent);color:#0A0F1E;
+  font-family:'Syne',sans-serif;font-size:16px;font-weight:700;border:none;border-radius:12px;
+  cursor:pointer;transition:all .2s;
+}
+.btn-login:hover { transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,255,176,.3); }
+.btn-login:active { transform:translateY(0); }
+
+.demo-hint {
+  margin-top:20px;padding:12px 16px;background:rgba(79,255,176,.06);
+  border:1px solid rgba(79,255,176,.15);border-radius:10px;font-size:12px;color:var(--muted);text-align:center;
+}
+.demo-hint strong { color:var(--accent); }
+.error-msg { display:none;color:var(--red);font-size:13px;margin-top:8px;text-align:center; }
+
+/* ═══════════════════════════════════════════
+   SHARED LAYOUT (Dashboard pages)
+═══════════════════════════════════════════ */
+.app-layout { display:flex;width:100%;min-height:100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);
+  padding:24px 0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;
+}
+.sb-logo { display:flex;align-items:center;gap:10px;padding:0 20px;margin-bottom:32px; }
+.sb-logo-icon {
+  width:34px;height:34px;background:var(--accent);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#0A0F1E;flex-shrink:0;
+}
+.sb-logo-text { font-family:'Syne',sans-serif;font-weight:700;font-size:17px; }
+.sb-nav { padding:0 10px;flex:1; }
+.sb-section { font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 10px;margin:20px 0 8px; }
+.sb-item {
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;
+  font-size:13.5px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s;margin-bottom:2px;
+  border:none;background:transparent;width:100%;text-align:left;
+}
+.sb-item:hover { background:var(--surf2);color:var(--text); }
+.sb-item.active { background:rgba(79,255,176,.1);color:var(--accent); }
+.sb-icon { font-size:15px;width:18px;text-align:center; }
+.sb-footer { padding:14px 20px;border-top:1px solid var(--border);margin-top:auto; }
+.sb-user { display:flex;align-items:center;gap:10px; }
+.sb-avatar {
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:white;flex-shrink:0;
+}
+.sb-name { font-size:13.5px;font-weight:500; }
+.sb-role { font-size:11px;color:var(--muted); }
+
+/* MAIN CONTENT */
+.main-content { margin-left:var(--sidebar);flex:1;padding:28px 28px 40px;overflow-y:auto; }
+
+/* Topbar */
+.topbar { display:flex;align-items:center;justify-content:space-between;margin-bottom:28px; }
+.page-heading { font-family:'Syne',sans-serif;font-size:22px;font-weight:700; }
+.page-heading span { color:var(--muted);font-size:13px;font-weight:400;display:block;margin-top:2px; }
+.xp-pill {
+  display:flex;align-items:center;gap:8px;padding:7px 14px;
+  background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.2);
+  border-radius:100px;font-size:13px;font-weight:600;color:var(--gold);
+}
+
+/* Cards */
+.card {
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;
+}
+.card-title {
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:18px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-link { font-size:12px;color:var(--accent);font-family:'DM Sans',sans-serif;font-weight:400;cursor:pointer; }
+
+/* ═══════════════════════════════════════════
+   ② DASHBOARD SISWA
+═══════════════════════════════════════════ */
+.hero-card {
+  background:linear-gradient(135deg,#0D1B2A,#1A1040 60%,#0F2A1A);
+  border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden;
+}
+.hero-card::before {
+  content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(79,255,176,.15),transparent 70%);border-radius:50%;
+}
+.hero-top { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px; }
+.level-badge {
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(79,255,176,.15);border:1px solid rgba(79,255,176,.3);
+  padding:5px 12px;border-radius:100px;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:10px;
+}
+.hero-name { font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:3px; }
+.hero-sub { color:var(--muted);font-size:13px; }
+.rank-label { font-size:11px;color:var(--muted);margin-bottom:4px;text-align:right; }
+.rank-num { font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:var(--gold);line-height:1; }
+.xp-labels { display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px; }
+.xp-labels strong { color:var(--text); }
+.xp-bar-wrap { background:rgba(255,255,255,.08);border-radius:100px;height:9px;overflow:hidden; }
+.xp-bar-fill { height:100%;border-radius:100px;background:linear-gradient(90deg,var(--purple),var(--accent));transition:width 1.2s cubic-bezier(.16,1,.3,1); }
+
+.stats-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px; }
+.stat-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px; }
+.stat-icon { font-size:20px;margin-bottom:10px; }
+.stat-val { font-family:'Syne',sans-serif;font-size:26px;font-weight:700;line-height:1;margin-bottom:3px; }
+.stat-lbl { font-size:11px;color:var(--muted); }
+
+.two-col { display:grid;grid-template-columns:1fr 300px;gap:18px;margin-bottom:18px; }
+.bottom-row { display:grid;grid-template-columns:1fr 1fr;gap:18px; }
+
+/* Mission items */
+.mission-item {
+  display:flex;align-items:center;gap:12px;padding:12px;background:var(--surf2);
+  border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s;border:1px solid transparent;
+}
+.mission-item:hover { border-color:rgba(79,255,176,.2);transform:translateX(3px); }
+.m-icon { width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0; }
+.m-name { font-size:13px;font-weight:500;margin-bottom:5px; }
+.m-bar-wrap { background:rgba(255,255,255,.07);border-radius:100px;height:4px; }
+.m-bar-fill { height:100%;border-radius:100px; }
+.m-xp { font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0; }
+
+/* Badge grid */
+.badge-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px; }
+.badge-item {
+  background:var(--surf2);border-radius:10px;padding:12px 6px;text-align:center;
+  border:1px solid var(--border);transition:all .2s;
+}
+.badge-item:hover { border-color:rgba(79,255,176,.3); }
+.badge-item.locked { opacity:.35;filter:grayscale(1); }
+.badge-emoji { font-size:22px;margin-bottom:5px; }
+.badge-name { font-size:10px;color:var(--muted);line-height:1.3; }
+
+/* Leaderboard */
+.lb-item { display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border); }
+.lb-item:last-child { border-bottom:none; }
+.lb-rank { width:22px;text-align:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);flex-shrink:0; }
+.lb-rank.g1 { color:var(--gold); } .lb-rank.g2 { color:#C0C0C0; } .lb-rank.g3 { color:#CD7F32; }
+.lb-av { width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0; }
+.lb-name { flex:1;font-size:13px;font-weight:500; }
+.lb-name span { display:block;font-size:10px;color:var(--muted);font-weight:400; }
+.lb-pts { font-size:13px;font-weight:600;color:var(--accent); }
+
+/* Activity */
+.act-item { display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px; }
+.act-item:last-child { border-bottom:none; }
+.act-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
+.act-dot.g { background:var(--accent); } .act-dot.p { background:var(--purple); } .act-dot.y { background:var(--gold); }
+.act-desc { font-size:12px;margin-bottom:2px; }
+.act-time { font-size:10px;color:var(--muted); }
+.act-xp { font-size:12px;font-weight:600;color:var(--accent);margin-left:auto;flex-shrink:0; }
+
+/* ═══════════════════════════════════════════
+   ③ MISI & KUIS
+═══════════════════════════════════════════ */
+.filter-tabs { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap; }
+.filter-tab {
+  padding:7px 16px;border-radius:100px;font-size:13px;font-weight:500;cursor:pointer;
+  transition:all .2s;border:1px solid var(--border);color:var(--muted);background:transparent;
+}
+.filter-tab.active { background:var(--accent);color:#0A0F1E;border-color:var(--accent); }
+
+.mission-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-bottom:28px; }
+.mc {
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;cursor:pointer;transition:all .25s;
+}
+.mc:hover { transform:translateY(-2px);border-color:rgba(79,255,176,.25); }
+.mc.locked { opacity:.5;cursor:not-allowed; }
+.mc-head { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px; }
+.mc-icon { width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px; }
+.mc-badge { font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px; }
+.b-aktif { background:rgba(79,255,176,.1);color:var(--accent);border:1px solid rgba(79,255,176,.2); }
+.b-selesai { background:rgba(123,97,255,.1);color:var(--purple);border:1px solid rgba(123,97,255,.2); }
+.b-baru { background:rgba(255,209,102,.1);color:var(--gold);border:1px solid rgba(255,209,102,.2); }
+.b-kunci { background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border); }
+.mc-title { font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px; }
+.mc-desc { font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px; }
+.mc-meta { display:flex;align-items:center;justify-content:space-between;margin-bottom:10px; }
+.mc-xp { font-size:12px;font-weight:600;color:var(--gold); }
+.mc-soal { font-size:11px;color:var(--muted); }
+.mc-prog-wrap { background:rgba(255,255,255,.07);border-radius:100px;height:4px;margin-bottom:12px; }
+.mc-prog-fill { height:100%;border-radius:100px; }
+.btn-mc {
+  width:100%;padding:9px;border-radius:9px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;border:none;
+}
+.btn-start { background:var(--accent);color:#0A0F1E; }
+.btn-start:hover { box-shadow:0 5px 18px rgba(79,255,176,.3); }
+.btn-cont { background:rgba(123,97,255,.15);color:var(--purple);border:1px solid rgba(123,97,255,.3)!important; }
+.btn-done { background:rgba(255,255,255,.05);color:var(--muted);cursor:default; }
+
+/* ═══════════════════════════════════════════
+   ④ DASHBOARD GURU
+═══════════════════════════════════════════ */
+.teacher-stats { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px; }
+.progress-table { width:100%;border-collapse:collapse; }
+.progress-table th {
+  text-align:left;font-size:11px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.8px;padding:0 10px 12px;
+}
+.progress-table td { padding:10px;border-bottom:1px solid var(--border);font-size:13px; }
+.progress-table tr:last-child td { border-bottom:none; }
+.progress-table tr:hover td { background:rgba(255,255,255,.02); }
+.t-avatar {
+  width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:white;margin-right:8px;vertical-align:middle;
+}
+.t-bar-wrap { background:rgba(255,255,255,.07);border-radius:100px;height:5px;width:100px;display:inline-block;vertical-align:middle; }
+.t-bar-fill { height:100%;border-radius:100px;background:var(--accent); }
+.t-badge { font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600; }
+.t-b-high { background:rgba(79,255,176,.1);color:var(--accent); }
+.t-b-mid  { background:rgba(255,209,102,.1);color:var(--gold); }
+.t-b-low  { background:rgba(255,107,107,.1);color:var(--red); }
+
+/* ═══════════════════════════════════════════
+   QUIZ MODAL
+═══════════════════════════════════════════ */
+.modal-overlay {
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(6px);z-index:1000;align-items:center;justify-content:center;
+}
+.modal-overlay.show { display:flex; }
+.modal-box {
+  background:var(--surface);border:1px solid var(--border);border-radius:22px;
+  width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;padding:32px;
+  animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both;
+}
+.modal-head { display:flex;align-items:center;justify-content:space-between;margin-bottom:24px; }
+.modal-title { font-family:'Syne',sans-serif;font-size:18px;font-weight:700; }
+.modal-close {
+  background:var(--surf2);border:none;color:var(--muted);width:34px;height:34px;
+  border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.modal-close:hover { color:var(--text); }
+.quiz-prog-labels { display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px; }
+.quiz-prog-bar { background:rgba(255,255,255,.07);border-radius:100px;height:5px;margin-bottom:22px; }
+.quiz-prog-fill { height:100%;border-radius:100px;background:linear-gradient(90deg,var(--purple),var(--accent));transition:width .4s; }
+.q-num { font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px; }
+.q-text { font-family:'Syne',sans-serif;font-size:17px;font-weight:600;line-height:1.4;margin-bottom:20px; }
+.options-list { display:flex;flex-direction:column;gap:9px;margin-bottom:20px; }
+.opt-btn {
+  padding:12px 16px;border-radius:11px;border:1px solid var(--border);background:var(--surf2);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;text-align:left;cursor:pointer;transition:all .2s;
+}
+.opt-btn:hover:not(:disabled) { border-color:rgba(79,255,176,.3);background:rgba(79,255,176,.05); }
+.opt-btn.correct { border-color:var(--accent)!important;background:rgba(79,255,176,.1)!important;color:var(--accent)!important; }
+.opt-btn.wrong   { border-color:var(--red)!important;background:rgba(255,107,107,.1)!important;color:var(--red)!important; }
+.feedback { padding:12px;border-radius:10px;margin-bottom:18px;font-size:13px;display:none; }
+.feedback.correct { background:rgba(79,255,176,.08);border:1px solid rgba(79,255,176,.2);color:var(--accent); }
+.feedback.wrong   { background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);color:var(--red); }
+.btn-next {
+  width:100%;padding:13px;border-radius:11px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  background:var(--accent);color:#0A0F1E;border:none;cursor:pointer;transition:all .2s;display:none;
+}
+.btn-next:hover { box-shadow:0 5px 18px rgba(79,255,176,.3); }
+.result-screen { text-align:center;padding:10px 0; }
+.result-icon { font-size:52px;margin-bottom:14px; }
+.result-title { font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:7px; }
+.result-sub { color:var(--muted);font-size:14px;margin-bottom:22px; }
+.result-xp { font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--gold);margin-bottom:22px; }
+.result-xp span { font-size:16px;color:var(--muted);display:block;font-family:'DM Sans',sans-serif;font-weight:400; }
+.btn-close-result {
+  padding:13px 32px;border-radius:11px;background:var(--accent);color:#0A0F1E;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .2s;
+}
+.btn-close-result:hover { box-shadow:0 5px 18px rgba(79,255,176,.3); }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:700px){
+  .login-wrapper{flex-direction:column;width:95vw;}
+  .brand-panel{padding:28px;}
+  .form-panel{width:100%;padding:28px;}
+  .stats-row{display:none;}
+  .brand-tagline h1{font-size:24px;}
+  --sidebar:0px;
+  .sidebar{transform:translateX(-100%);}
+  .main-content{margin-left:0;}
+  .stats-grid,.teacher-stats{grid-template-columns:repeat(2,1fr);}
+  .two-col,.bottom-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ORBs (login bg) -->
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- ════════════════════════════════════════
+     PAGE 1: LOGIN
+════════════════════════════════════════ -->
+<div id="page-login" class="page active">
+  <div class="login-wrapper">
+    <div class="brand-panel">
+      <div class="logo-mark">
+        <div class="logo-icon">EQ</div>
+        <span class="logo-text">EduQuest</span>
+      </div>
+      <div class="brand-tagline">
+        <h1>Belajar <span>Lebih Seru</span>, Prestasi Lebih Nyata</h1>
+        <p>Platform gamifikasi pendidikan yang mengubah proses belajar menjadi petualangan penuh tantangan, poin, dan pencapaian.</p>
+        <div class="stats-row">
+          <div><div class="stat-num">500+</div><div class="stat-label">Pengguna Aktif</div></div>
+          <div><div class="stat-num">120+</div><div class="stat-label">Misi Tersedia</div></div>
+          <div><div class="stat-num">98%</div><div class="stat-label">Kepuasan Siswa</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-panel">
+      <div class="form-title">Selamat Datang!</div>
+      <div class="form-subtitle">Masuk untuk melanjutkan petualangan belajarmu.</div>
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="selectRole(this,'siswa')">🎓 Siswa</button>
+        <button class="role-tab" onclick="selectRole(this,'guru')">👨‍🏫 Guru</button>
+      </div>
+      <div class="field"><label>Username / NIM</label><input type="text" id="uname" placeholder="siswa01 atau guru01"></div>
+      <div class="field"><label>Password</label><input type="password" id="upass" placeholder="••••••••"></div>
+      <button class="btn-login" onclick="doLogin()">Masuk ke EduQuest →</button>
+      <div class="error-msg" id="err-msg">Username atau password salah.</div>
+      <div class="demo-hint">
+        Demo siswa: <strong>siswa01</strong> / <strong>123456</strong><br>
+        Demo guru: <strong>guru01</strong> / <strong>123456</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 2: DASHBOARD SISWA
+════════════════════════════════════════ -->
+<div id="page-siswa" class="page">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-icon">EQ</div>
+        <span class="sb-logo-text">EduQuest</span>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-section">Menu Utama</div>
+        <button class="sb-item active" onclick="showSubPage('siswa','dashboard')">
+          <span class="sb-icon">🏠</span> Dashboard
+        </button>
+        <button class="sb-item" onclick="showSubPage('siswa','misi')">
+          <span class="sb-icon">⚔️</span> Misi & Kuis
+        </button>
+        <button class="sb-item" onclick="showSubPage('siswa','leaderboard')">
+          <span class="sb-icon">🏆</span> Leaderboard
+        </button>
+        <button class="sb-item" onclick="showSubPage('siswa','badge')">
+          <span class="sb-icon">🎖️</span> Koleksi Badge
+        </button>
+        <div class="sb-section">Lainnya</div>
+        <button class="sb-item" onclick="doLogout()">
+          <span class="sb-icon">🚪</span> Keluar
+        </button>
+      </nav>
+      <div class="sb-footer">
+        <div class="sb-user">
+          <div class="sb-avatar">AL</div>
+          <div><div class="sb-name">Ahmad Luthfi</div><div class="sb-role">Level 7 · Elektro '23</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+
+      <!-- SUB: DASHBOARD -->
+      <div id="siswa-dashboard" class="sub-page">
+        <div class="topbar">
+          <div class="page-heading">Selamat datang, Ahmad! 👋<span>Kamis, 16 April 2026</span></div>
+          <div class="xp-pill">⚡ 3.450 XP</div>
+        </div>
+
+        <!-- Hero -->
+        <div class="hero-card">
+          <div class="hero-top">
+            <div>
+              <div class="level-badge">⭐ LEVEL 7 — Pendekar Digital</div>
+              <div class="hero-name">Ahmad Luthfi Pratama</div>
+              <div class="hero-sub">Teknik Elektro · Angkatan 2023</div>
+            </div>
+            <div><div class="rank-label">Peringkat Kelas</div><div class="rank-num">#3</div></div>
+          </div>
+          <div class="xp-labels"><span><strong>3.450 XP</strong> diperoleh</span><span>Level 8 di <strong>4.000 XP</strong></span></div>
+          <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpBar" style="width:0%"></div></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-val" style="color:var(--accent)">24</div><div class="stat-lbl">Misi Selesai</div></div>
+          <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-val" style="color:var(--red)">12</div><div class="stat-lbl">Streak Hari</div></div>
+          <div class="stat-card"><div class="stat-icon">🎖️</div><div class="stat-val" style="color:var(--gold)">9</div><div class="stat-lbl">Badge Diraih</div></div>
+          <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-val" style="color:var(--purple)">87%</div><div class="stat-lbl">Akurasi Kuis</div></div>
+        </div>
+
+        <!-- Two col -->
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title">Misi Aktif <span class="card-link" onclick="showSubPage('siswa','misi')">Lihat Semua →</span></div>
+            <div class="mission-item" onclick="showSubPage('siswa','misi')">
+              <div class="m-icon" style="background:rgba(123,97,255,.15)">🔢</div>
+              <div style="flex:1;min-width:0">
+                <div class="m-name">Rangkaian Listrik Dasar</div>
+                <div class="m-bar-wrap"><div class="m-bar-fill" style="width:75%;background:var(--purple)"></div></div>
+              </div>
+              <div class="m-xp">+150 XP</div>
+            </div>
+            <div class="mission-item" onclick="showSubPage('siswa','misi')">
+              <div class="m-icon" style="background:rgba(79,255,176,.1)">⚡</div>
+              <div style="flex:1;min-width:0">
+                <div class="m-name">Hukum Kirchhoff & Teorema</div>
+                <div class="m-bar-wrap"><div class="m-bar-fill" style="width:40%;background:var(--accent)"></div></div>
+              </div>
+              <div class="m-xp">+200 XP</div>
+            </div>
+            <div class="mission-item" onclick="showSubPage('siswa','misi')">
+              <div class="m-icon" style="background:rgba(255,209,102,.1)">🧮</div>
+              <div style="flex:1;min-width:0">
+                <div class="m-name">Aljabar Boolean & Logika</div>
+                <div class="m-bar-wrap"><div class="m-bar-fill" style="width:90%;background:var(--gold)"></div></div>
+              </div>
+              <div class="m-xp">+100 XP</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Badge Koleksi <span class="card-link">Lihat Semua →</span></div>
+            <div class="badge-grid">
+              <div class="badge-item"><div class="badge-emoji">🏅</div><div class="badge-name">Pemula Aktif</div></div>
+              <div class="badge-item"><div class="badge-emoji">🔥</div><div class="badge-name">Streak Master</div></div>
+              <div class="badge-item"><div class="badge-emoji">⚡</div><div class="badge-name">Elektro Cepat</div></div>
+              <div class="badge-item"><div class="badge-emoji">🧠</div><div class="badge-name">Quiz Genius</div></div>
+              <div class="badge-item"><div class="badge-emoji">🏆</div><div class="badge-name">Top 3 Kelas</div></div>
+              <div class="badge-item locked"><div class="badge-emoji">👑</div><div class="badge-name">Juara Kelas</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom -->
+        <div class="bottom-row">
+          <div class="card">
+            <div class="card-title">Leaderboard Kelas <span class="card-link" onclick="showSubPage('siswa','leaderboard')">Lihat Penuh →</span></div>
+            <div class="lb-item"><div class="lb-rank g1">🥇</div><div class="lb-av" style="background:linear-gradient(135deg,#FFD166,#FF6B6B)">BW</div><div class="lb-name">Budi Wicaksono <span>Level 9</span></div><div class="lb-pts">4.120 XP</div></div>
+            <div class="lb-item"><div class="lb-rank g2">🥈</div><div class="lb-av" style="background:linear-gradient(135deg,#7B61FF,#4FFFB0)">SR</div><div class="lb-name">Siti Rahayu <span>Level 8</span></div><div class="lb-pts">3.870 XP</div></div>
+            <div class="lb-item" style="background:rgba(79,255,176,.04);border-radius:8px;padding:8px"><div class="lb-rank g3">🥉</div><div class="lb-av" style="background:linear-gradient(135deg,#4FFFB0,#7B61FF)">AL</div><div class="lb-name"><strong>Ahmad Luthfi</strong> <span>Kamu!</span></div><div class="lb-pts">3.450 XP</div></div>
+            <div class="lb-item"><div class="lb-rank">4</div><div class="lb-av" style="background:linear-gradient(135deg,#FF6B6B,#7B61FF)">DP</div><div class="lb-name">Dika Permana <span>Level 7</span></div><div class="lb-pts">3.200 XP</div></div>
+            <div class="lb-item"><div class="lb-rank">5</div><div class="lb-av" style="background:linear-gradient(135deg,#243044,#7B61FF)">NA</div><div class="lb-name">Nur Aisyah <span>Level 6</span></div><div class="lb-pts">2.980 XP</div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Aktivitas Terbaru</div>
+            <div class="act-item"><div class="act-dot g"></div><div><div class="act-desc">Menyelesaikan kuis Hukum Ohm</div><div class="act-time">2 jam yang lalu</div></div><div class="act-xp">+80 XP</div></div>
+            <div class="act-item"><div class="act-dot p"></div><div><div class="act-desc">Naik ke Level 7! 🎉</div><div class="act-time">Kemarin, 20:14</div></div><div class="act-xp">🎉</div></div>
+            <div class="act-item"><div class="act-dot y"></div><div><div class="act-desc">Dapat badge "Top 3 Kelas"</div><div class="act-time">Kemarin, 20:14</div></div><div class="act-xp">🏆</div></div>
+            <div class="act-item"><div class="act-dot g"></div><div><div class="act-desc">Misi Boolean Logic 90% selesai</div><div class="act-time">2 hari lalu</div></div><div class="act-xp">+120 XP</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB: MISI -->
+      <div id="siswa-misi" class="sub-page" style="display:none">
+        <div class="topbar">
+          <div class="page-heading">Misi & Kuis ⚔️<span>Kerjakan misi untuk dapatkan XP</span></div>
+          <div class="xp-pill">⚡ 3.450 XP</div>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="filterMisi(this,'semua')">Semua</button>
+          <button class="filter-tab" onclick="filterMisi(this,'aktif')">Sedang Berjalan</button>
+          <button class="filter-tab" onclick="filterMisi(this,'baru')">Belum Dimulai</button>
+          <button class="filter-tab" onclick="filterMisi(this,'selesai')">Selesai</button>
+        </div>
+        <div class="mission-grid" id="missionGrid">
+          <div class="mc" data-status="aktif">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(123,97,255,.15)">🔢</div><span class="mc-badge b-aktif">Aktif</span></div>
+            <div class="mc-title">Rangkaian Listrik Dasar</div>
+            <div class="mc-desc">Pahami komponen dasar: resistor, kapasitor, induktor, dan sumber tegangan.</div>
+            <div class="mc-meta"><span class="mc-xp">+150 XP</span><span class="mc-soal">10 soal · ~15 mnt</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:75%;background:var(--purple)"></div></div>
+            <button class="btn-mc btn-cont" onclick="openQuiz('Rangkaian Listrik Dasar','elektro')">Lanjutkan →</button>
+          </div>
+          <div class="mc" data-status="aktif">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(79,255,176,.1)">⚡</div><span class="mc-badge b-aktif">Aktif</span></div>
+            <div class="mc-title">Hukum Kirchhoff & Teorema</div>
+            <div class="mc-desc">Kuasai KVL dan KCL untuk menganalisis rangkaian kompleks.</div>
+            <div class="mc-meta"><span class="mc-xp">+200 XP</span><span class="mc-soal">8 soal · ~20 mnt</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:40%;background:var(--accent)"></div></div>
+            <button class="btn-mc btn-cont" onclick="openQuiz('Hukum Kirchhoff','kirchhoff')">Lanjutkan →</button>
+          </div>
+          <div class="mc" data-status="baru">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(255,209,102,.1)">🧮</div><span class="mc-badge b-baru">Baru</span></div>
+            <div class="mc-title">Aljabar Boolean & Logika</div>
+            <div class="mc-desc">Operasi AND, OR, NOT dan penyederhanaan dengan Karnaugh Map.</div>
+            <div class="mc-meta"><span class="mc-xp">+180 XP</span><span class="mc-soal">12 soal · ~25 mnt</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:0%;background:var(--gold)"></div></div>
+            <button class="btn-mc btn-start" onclick="openQuiz('Aljabar Boolean','boolean')">Mulai Misi ⚡</button>
+          </div>
+          <div class="mc" data-status="baru">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(255,107,107,.1)">📡</div><span class="mc-badge b-baru">Baru</span></div>
+            <div class="mc-title">Sistem IoT & Sensor</div>
+            <div class="mc-desc">Arsitektur IoT, jenis sensor, dan cara koneksi perangkat ke internet.</div>
+            <div class="mc-meta"><span class="mc-xp">+250 XP</span><span class="mc-soal">10 soal · ~20 mnt</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:0%;background:var(--red)"></div></div>
+            <button class="btn-mc btn-start" onclick="openQuiz('Sistem IoT','iot')">Mulai Misi ⚡</button>
+          </div>
+          <div class="mc" data-status="selesai">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(123,97,255,.1)">🔋</div><span class="mc-badge b-selesai">Selesai ✓</span></div>
+            <div class="mc-title">Hukum Ohm & Daya Listrik</div>
+            <div class="mc-desc">Hubungan tegangan, arus, hambatan, dan perhitungan daya listrik.</div>
+            <div class="mc-meta"><span class="mc-xp">+100 XP ✓</span><span class="mc-soal">Skor: 90/100</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:100%;background:var(--purple)"></div></div>
+            <button class="btn-mc btn-done" disabled>Sudah Selesai</button>
+          </div>
+          <div class="mc locked" data-status="kunci">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(255,255,255,.05)">🔒</div><span class="mc-badge b-kunci">Terkunci</span></div>
+            <div class="mc-title">Mikrokontroler & Arduino</div>
+            <div class="mc-desc">Selesaikan misi IoT untuk membuka misi ini.</div>
+            <div class="mc-meta"><span class="mc-xp">+300 XP</span><span class="mc-soal">15 soal</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:0%"></div></div>
+            <button class="btn-mc btn-done" disabled>🔒 Terkunci</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB: LEADERBOARD -->
+      <div id="siswa-leaderboard" class="sub-page" style="display:none">
+        <div class="topbar"><div class="page-heading">Leaderboard 🏆<span>Ranking kelas real-time</span></div><div class="xp-pill">⚡ 3.450 XP</div></div>
+        <div class="card" style="max-width:680px">
+          <div class="card-title">Ranking Kelas — Teknik Elektro 2023</div>
+          <div style="margin-bottom:16px">
+            <div class="lb-item"><div class="lb-rank g1">🥇</div><div class="lb-av" style="background:linear-gradient(135deg,#FFD166,#FF6B6B)">BW</div><div class="lb-name">Budi Wicaksono <span>Level 9 · 24 misi</span></div><div class="lb-pts">4.120 XP</div></div>
+            <div class="lb-item"><div class="lb-rank g2">🥈</div><div class="lb-av" style="background:linear-gradient(135deg,#7B61FF,#4FFFB0)">SR</div><div class="lb-name">Siti Rahayu <span>Level 8 · 22 misi</span></div><div class="lb-pts">3.870 XP</div></div>
+            <div class="lb-item" style="background:rgba(79,255,176,.04);border-radius:8px;padding:10px"><div class="lb-rank g3">🥉</div><div class="lb-av" style="background:linear-gradient(135deg,#4FFFB0,#7B61FF)">AL</div><div class="lb-name"><strong>Ahmad Luthfi</strong> <span>Level 7 · 20 misi · Kamu!</span></div><div class="lb-pts">3.450 XP</div></div>
+            <div class="lb-item"><div class="lb-rank">4</div><div class="lb-av" style="background:linear-gradient(135deg,#FF6B6B,#7B61FF)">DP</div><div class="lb-name">Dika Permana <span>Level 7 · 19 misi</span></div><div class="lb-pts">3.200 XP</div></div>
+            <div class="lb-item"><div class="lb-rank">5</div><div class="lb-av" style="background:linear-gradient(135deg,#243044,#7B61FF)">NA</div><div class="lb-name">Nur Aisyah <span>Level 6 · 17 misi</span></div><div class="lb-pts">2.980 XP</div></div>
+            <div class="lb-item"><div class="lb-rank">6</div><div class="lb-av" style="background:linear-gradient(135deg,#FFD166,#4FFFB0)">RP</div><div class="lb-name">Rizky Putra <span>Level 6 · 16 misi</span></div><div class="lb-pts">2.740 XP</div></div>
+            <div class="lb-item"><div class="lb-rank">7</div><div class="lb-av" style="background:linear-gradient(135deg,#7B61FF,#FF6B6B)">AF</div><div class="lb-name">Andi Fauzan <span>Level 5 · 14 misi</span></div><div class="lb-pts">2.450 XP</div></div>
+            <div class="lb-item"><div class="lb-rank">8</div><div class="lb-av" style="background:linear-gradient(135deg,#4FFFB0,#FFD166)">LK</div><div class="lb-name">Laila Kusuma <span>Level 5 · 13 misi</span></div><div class="lb-pts">2.200 XP</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB: BADGE -->
+      <div id="siswa-badge" class="sub-page" style="display:none">
+        <div class="topbar"><div class="page-heading">Koleksi Badge 🎖️<span>9 dari 12 badge diraih</span></div><div class="xp-pill">⚡ 3.450 XP</div></div>
+        <div class="badge-grid" style="max-width:600px;grid-template-columns:repeat(4,1fr);gap:12px">
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">🏅</div><div class="badge-name" style="font-size:12px">Pemula Aktif</div></div>
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">🔥</div><div class="badge-name" style="font-size:12px">Streak Master</div></div>
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">⚡</div><div class="badge-name" style="font-size:12px">Elektro Cepat</div></div>
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">🧠</div><div class="badge-name" style="font-size:12px">Quiz Genius</div></div>
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">🏆</div><div class="badge-name" style="font-size:12px">Top 3 Kelas</div></div>
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">📚</div><div class="badge-name" style="font-size:12px">Rajin Belajar</div></div>
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">⚙️</div><div class="badge-name" style="font-size:12px">Teknik Pro</div></div>
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">🎯</div><div class="badge-name" style="font-size:12px">Tepat Sasaran</div></div>
+          <div class="badge-item" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">🌟</div><div class="badge-name" style="font-size:12px">Bintang Kelas</div></div>
+          <div class="badge-item locked" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">👑</div><div class="badge-name" style="font-size:12px">Juara Kelas</div></div>
+          <div class="badge-item locked" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">🚀</div><div class="badge-name" style="font-size:12px">Speed Learner</div></div>
+          <div class="badge-item locked" style="padding:18px 10px"><div class="badge-emoji" style="font-size:28px">💡</div><div class="badge-name" style="font-size:12px">Inovator</div></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 3: DASHBOARD GURU
+════════════════════════════════════════ -->
+<div id="page-guru" class="page">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-icon">EQ</div>
+        <span class="sb-logo-text">EduQuest</span>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-section">Menu Guru</div>
+        <button class="sb-item active" onclick="showSubPage('guru','overview')"><span class="sb-icon">📊</span> Overview Kelas</button>
+        <button class="sb-item" onclick="showSubPage('guru','progres')"><span class="sb-icon">📈</span> Progres Siswa</button>
+        <button class="sb-item" onclick="showSubPage('guru','misi-guru')"><span class="sb-icon">⚔️</span> Kelola Misi</button>
+        <div class="sb-section">Lainnya</div>
+        <button class="sb-item" onclick="doLogout()"><span class="sb-icon">🚪</span> Keluar</button>
+      </nav>
+      <div class="sb-footer">
+        <div class="sb-user">
+          <div class="sb-avatar" style="background:linear-gradient(135deg,#FFD166,#FF6B6B)">BS</div>
+          <div><div class="sb-name">Bpk. Budi Santoso</div><div class="sb-role">Dosen · Teknik Elektro</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- OVERVIEW -->
+      <div id="guru-overview" class="sub-page">
+        <div class="topbar">
+          <div class="page-heading">Dashboard Guru 👨‍🏫<span>Kelas Teknik Elektro 2023</span></div>
+          <div class="xp-pill" style="background:rgba(255,209,102,.1);border-color:rgba(255,209,102,.2)">📅 Kamis, 16 April 2026</div>
+        </div>
+        <div class="teacher-stats">
+          <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-val" style="color:var(--accent)">32</div><div class="stat-lbl">Total Mahasiswa</div></div>
+          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-val" style="color:var(--purple)">28</div><div class="stat-lbl">Aktif Minggu Ini</div></div>
+          <div class="stat-card"><div class="stat-icon">⚔️</div><div class="stat-val" style="color:var(--gold)">156</div><div class="stat-lbl">Misi Diselesaikan</div></div>
+          <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-val" style="color:var(--red)">82%</div><div class="stat-lbl">Rata-rata Akurasi</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title">Top 5 Mahasiswa Terbaik</div>
+            <div class="lb-item"><div class="lb-rank g1">🥇</div><div class="lb-av" style="background:linear-gradient(135deg,#FFD166,#FF6B6B)">BW</div><div class="lb-name">Budi Wicaksono <span>4.120 XP · Level 9</span></div><span class="t-badge t-b-high">Sangat Aktif</span></div>
+            <div class="lb-item"><div class="lb-rank g2">🥈</div><div class="lb-av" style="background:linear-gradient(135deg,#7B61FF,#4FFFB0)">SR</div><div class="lb-name">Siti Rahayu <span>3.870 XP · Level 8</span></div><span class="t-badge t-b-high">Sangat Aktif</span></div>
+            <div class="lb-item"><div class="lb-rank g3">🥉</div><div class="lb-av" style="background:linear-gradient(135deg,#4FFFB0,#7B61FF)">AL</div><div class="lb-name">Ahmad Luthfi <span>3.450 XP · Level 7</span></div><span class="t-badge t-b-high">Aktif</span></div>
+            <div class="lb-item"><div class="lb-rank">4</div><div class="lb-av" style="background:linear-gradient(135deg,#FF6B6B,#7B61FF)">DP</div><div class="lb-name">Dika Permana <span>3.200 XP · Level 7</span></div><span class="t-badge t-b-mid">Aktif</span></div>
+            <div class="lb-item"><div class="lb-rank">5</div><div class="lb-av" style="background:linear-gradient(135deg,#243044,#7B61FF)">NA</div><div class="lb-name">Nur Aisyah <span>2.980 XP · Level 6</span></div><span class="t-badge t-b-mid">Aktif</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Perlu Perhatian ⚠️</div>
+            <div style="color:var(--muted);font-size:13px;margin-bottom:12px">Mahasiswa dengan aktivitas rendah minggu ini:</div>
+            <div class="lb-item"><div class="lb-av" style="background:linear-gradient(135deg,#FF6B6B,#FFD166)">MF</div><div class="lb-name">Muhammad Faiz <span>890 XP · 3 hari tidak aktif</span></div><span class="t-badge t-b-low">Pasif</span></div>
+            <div class="lb-item"><div class="lb-av" style="background:linear-gradient(135deg,#243044,#FF6B6B)">RN</div><div class="lb-name">Rina Novitasari <span>720 XP · 4 hari tidak aktif</span></div><span class="t-badge t-b-low">Pasif</span></div>
+            <div class="lb-item"><div class="lb-av" style="background:linear-gradient(135deg,#7B61FF,#FFD166)">YS</div><div class="lb-name">Yusuf Setiawan <span>650 XP · 5 hari tidak aktif</span></div><span class="t-badge t-b-low">Pasif</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROGRES SISWA -->
+      <div id="guru-progres" class="sub-page" style="display:none">
+        <div class="topbar"><div class="page-heading">Progres Siswa 📈<span>Data progres belajar seluruh mahasiswa</span></div></div>
+        <div class="card">
+          <div class="card-title">Tabel Progres Kelas</div>
+          <table class="progress-table">
+            <thead><tr><th>Mahasiswa</th><th>Level</th><th>XP</th><th>Misi</th><th>Progres</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><span class="t-avatar" style="background:linear-gradient(135deg,#FFD166,#FF6B6B)">BW</span>Budi Wicaksono</td><td>9</td><td style="color:var(--accent)">4.120</td><td>24</td><td><div class="t-bar-wrap"><div class="t-bar-fill" style="width:100%"></div></div></td><td><span class="t-badge t-b-high">Sangat Aktif</span></td></tr>
+              <tr><td><span class="t-avatar" style="background:linear-gradient(135deg,#7B61FF,#4FFFB0)">SR</span>Siti Rahayu</td><td>8</td><td style="color:var(--accent)">3.870</td><td>22</td><td><div class="t-bar-wrap"><div class="t-bar-fill" style="width:94%"></div></div></td><td><span class="t-badge t-b-high">Sangat Aktif</span></td></tr>
+              <tr><td><span class="t-avatar" style="background:linear-gradient(135deg,#4FFFB0,#7B61FF)">AL</span>Ahmad Luthfi</td><td>7</td><td style="color:var(--accent)">3.450</td><td>20</td><td><div class="t-bar-wrap"><div class="t-bar-fill" style="width:84%"></div></div></td><td><span class="t-badge t-b-high">Aktif</span></td></tr>
+              <tr><td><span class="t-avatar" style="background:linear-gradient(135deg,#FF6B6B,#7B61FF)">DP</span>Dika Permana</td><td>7</td><td style="color:var(--accent)">3.200</td><td>19</td><td><div class="t-bar-wrap"><div class="t-bar-fill" style="width:78%"></div></div></td><td><span class="t-badge t-b-mid">Aktif</span></td></tr>
+              <tr><td><span class="t-avatar" style="background:linear-gradient(135deg,#243044,#7B61FF)">NA</span>Nur Aisyah</td><td>6</td><td style="color:var(--gold)">2.980</td><td>17</td><td><div class="t-bar-wrap"><div class="t-bar-fill" style="width:72%"></div></div></td><td><span class="t-badge t-b-mid">Aktif</span></td></tr>
+              <tr><td><span class="t-avatar" style="background:linear-gradient(135deg,#FF6B6B,#FFD166)">MF</span>Muhammad Faiz</td><td>3</td><td style="color:var(--red)">890</td><td>6</td><td><div class="t-bar-wrap"><div class="t-bar-fill" style="width:22%;background:var(--red)"></div></div></td><td><span class="t-badge t-b-low">Pasif</span></td></tr>
+              <tr><td><span class="t-avatar" style="background:linear-gradient(135deg,#243044,#FF6B6B)">RN</span>Rina Novitasari</td><td>2</td><td style="color:var(--red)">720</td><td>5</td><td><div class="t-bar-wrap"><div class="t-bar-fill" style="width:17%;background:var(--red)"></div></div></td><td><span class="t-badge t-b-low">Pasif</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- KELOLA MISI -->
+      <div id="guru-misi-guru" class="sub-page" style="display:none">
+        <div class="topbar"><div class="page-heading">Kelola Misi ⚔️<span>Atur misi dan kuis untuk kelas</span></div></div>
+        <div class="mission-grid">
+          <div class="mc" style="border-color:rgba(79,255,176,.2)">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(123,97,255,.15)">🔢</div><span class="mc-badge b-aktif">Aktif</span></div>
+            <div class="mc-title">Rangkaian Listrik Dasar</div>
+            <div class="mc-desc">10 soal · Dikerjakan 28/32 mahasiswa</div>
+            <div class="mc-meta"><span class="mc-xp">150 XP</span><span class="mc-soal">Avg skor: 85%</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:88%;background:var(--accent)"></div></div>
+            <button class="btn-mc btn-cont">Lihat Detail</button>
+          </div>
+          <div class="mc">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(79,255,176,.1)">⚡</div><span class="mc-badge b-aktif">Aktif</span></div>
+            <div class="mc-title">Hukum Kirchhoff & Teorema</div>
+            <div class="mc-desc">8 soal · Dikerjakan 20/32 mahasiswa</div>
+            <div class="mc-meta"><span class="mc-xp">200 XP</span><span class="mc-soal">Avg skor: 79%</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:62%;background:var(--purple)"></div></div>
+            <button class="btn-mc btn-cont">Lihat Detail</button>
+          </div>
+          <div class="mc">
+            <div class="mc-head"><div class="mc-icon" style="background:rgba(255,209,102,.1)">➕</div><span class="mc-badge b-baru" style="background:rgba(255,209,102,.1);color:var(--gold);border-color:rgba(255,209,102,.2)">Draft</span></div>
+            <div class="mc-title">+ Tambah Misi Baru</div>
+            <div class="mc-desc">Buat misi dan soal kuis baru untuk mahasiswa.</div>
+            <div class="mc-meta"><span class="mc-xp">—</span><span class="mc-soal">—</span></div>
+            <div class="mc-prog-wrap"><div class="mc-prog-fill" style="width:0%"></div></div>
+            <button class="btn-mc btn-start">Buat Misi Baru</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- QUIZ MODAL -->
+<div class="modal-overlay" id="quizModal">
+  <div class="modal-box">
+    <div id="quizContent"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════
+// ROUTING
+// ═══════════════════════
+let currentRole = 'siswa';
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+}
+
+function showSubPage(role, sub) {
+  // Hide all sub-pages in this role
+  const prefix = role + '-';
+  document.querySelectorAll('.sub-page').forEach(sp => {
+    if (sp.id.startsWith(prefix)) sp.style.display = 'none';
+  });
+  const target = document.getElementById(role + '-' + sub);
+  if (target) { target.style.display = 'block'; }
+
+  // Sidebar active state
+  document.querySelectorAll('#page-' + role + ' .sb-item').forEach(i => i.classList.remove('active'));
+  event && event.currentTarget && event.currentTarget.classList.add('active');
+
+  if (sub === 'dashboard') setTimeout(() => {
+    document.getElementById('xpBar').style.width = '86%';
+  }, 300);
+}
+
+// ═══════════════════════
+// AUTH
+// ═══════════════════════
+function selectRole(el, role) {
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentRole = role;
+  document.getElementById('uname').placeholder = role === 'siswa' ? 'siswa01' : 'guru01';
+}
+
+function doLogin() {
+  const u = document.getElementById('uname').value.trim();
+  const p = document.getElementById('upass').value.trim();
+  const err = document.getElementById('err-msg');
+  const accounts = {
+    siswa: { u: 'siswa01', p: '123456' },
+    guru:  { u: 'guru01',  p: '123456' }
+  };
+  const acc = accounts[currentRole];
+  if (u === acc.u && p === acc.p) {
+    err.style.display = 'none';
+    document.querySelector('.btn-login').textContent = 'Memuat...';
+    setTimeout(() => {
+      showPage(currentRole);
+      if (currentRole === 'siswa') setTimeout(() => {
+        document.getElementById('xpBar').style.width = '86%';
+      }, 400);
+    }, 500);
+  } else {
+    err.style.display = 'block';
+  }
+}
+
+function doLogout() {
+  document.getElementById('uname').value = '';
+  document.getElementById('upass').value = '';
+  document.querySelector('.btn-login').textContent = 'Masuk ke EduQuest →';
+  showPage('login');
+}
+
+document.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+
+// ═══════════════════════
+// MISI FILTER
+// ═══════════════════════
+function filterMisi(el, status) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.mc').forEach(c => {
+    c.style.display = (status === 'semua' || c.dataset.status === status) ? '' : 'none';
+  });
+}
+
+// ═══════════════════════
+// QUIZ ENGINE
+// ═══════════════════════
+const quizData = {
+  elektro: [
+    { q: "Satuan hambatan listrik adalah?", opts: ["Ampere","Volt","Ohm","Watt"], ans: 2, exp: "Hambatan diukur dalam Ohm (Ω), sesuai nama Georg Simon Ohm." },
+    { q: "Komponen yang menyimpan energi dalam medan listrik adalah?", opts: ["Resistor","Induktor","Kapasitor","Dioda"], ans: 2, exp: "Kapasitor menyimpan energi dalam medan listrik di antara dua pelat." },
+    { q: "Jika tegangan 12V dan hambatan 4Ω, arus yang mengalir adalah?", opts: ["48 A","3 A","8 A","0.3 A"], ans: 1, exp: "I = V/R = 12/4 = 3 Ampere (Hukum Ohm)." },
+  ],
+  kirchhoff: [
+    { q: "Hukum KCL menyatakan bahwa...", opts: ["Jumlah tegangan = 0","Jumlah arus masuk = arus keluar di titik cabang","Arus berbanding tegangan","Daya = tegangan × waktu"], ans: 1, exp: "KCL: total arus masuk ke simpul = total arus keluar dari simpul." },
+    { q: "Hukum KVL berlaku untuk?", opts: ["Titik cabang","Loop tertutup","Sumber arus","Hambatan paralel"], ans: 1, exp: "KVL: jumlah semua tegangan dalam loop tertutup adalah nol." },
+    { q: "Hambatan 2Ω, 3Ω, 5Ω seri dengan 20V, arus yang mengalir?", opts: ["2 A","4 A","1 A","10 A"], ans: 0, exp: "R total = 10Ω. I = 20/10 = 2 Ampere." },
+  ],
+  boolean: [
+    { q: "Hasil dari: 1 AND 0 = ?", opts: ["1","0","Tidak terdefinisi","1 atau 0"], ans: 1, exp: "AND menghasilkan 1 hanya jika KEDUA input bernilai 1." },
+    { q: "Gerbang NOT berfungsi sebagai?", opts: ["Penjumlah","Pembalik nilai input","Pengali","Pembagi"], ans: 1, exp: "NOT (inverter) membalik nilai: NOT 1 = 0, NOT 0 = 1." },
+    { q: "De Morgan: NOT(A AND B) = ?", opts: ["NOT A AND NOT B","NOT A OR NOT B","A OR B","A AND B"], ans: 1, exp: "Hukum De Morgan: NOT(A AND B) = NOT A OR NOT B." },
+  ],
+  iot: [
+    { q: "IoT singkatan dari?", opts: ["Internet of Technology","Internet of Things","Integration of Technology","Interface of Things"], ans: 1, exp: "IoT = Internet of Things, menghubungkan perangkat fisik ke internet." },
+    { q: "Protokol umum pada IoT adalah?", opts: ["HTTP saja","MQTT, HTTP, CoAP","FTP","SMTP"], ans: 1, exp: "IoT sering pakai MQTT, HTTP, CoAP untuk komunikasi ringan." },
+    { q: "Sensor DHT11 mengukur?", opts: ["Tekanan udara","Suhu dan kelembaban","Kecepatan angin","Cahaya"], ans: 1, exp: "DHT11 mengukur suhu dan kelembaban, populer di proyek Arduino/IoT." },
+  ],
+};
+
+let cQuiz = [], cQ = 0, score = 0, answered = false, misiTitle = '';
+
+function openQuiz(title, key) {
+  misiTitle = title;
+  cQuiz = quizData[key] || [];
+  cQ = 0; score = 0; answered = false;
+  document.getElementById('quizModal').classList.add('show');
+  renderQ();
+}
+
+function renderQ() {
+  const q = cQuiz[cQ];
+  const pct = Math.round((cQ / cQuiz.length) * 100);
+  document.getElementById('quizContent').innerHTML = `
+    <div class="modal-head">
+      <div class="modal-title">${misiTitle}</div>
+      <button class="modal-close" onclick="closeQuiz()">✕</button>
+    </div>
+    <div class="quiz-prog-labels"><span>Soal ${cQ+1} / ${cQuiz.length}</span><span>Skor: ${score}</span></div>
+    <div class="quiz-prog-bar"><div class="quiz-prog-fill" style="width:${pct}%"></div></div>
+    <div class="q-num">PERTANYAAN ${cQ+1}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="options-list">
+      ${q.opts.map((o,i)=>`<button class="opt-btn" id="opt${i}" onclick="selectAns(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+    </div>
+    <div class="feedback" id="fb"></div>
+    <button class="btn-next" id="btnNext" onclick="nextQ()">
+      ${cQ===cQuiz.length-1?'Lihat Hasil 🎉':'Soal Berikutnya →'}
+    </button>`;
+}
+
+function selectAns(idx) {
+  if (answered) return;
+  answered = true;
+  const q = cQuiz[cQ];
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  if (idx === q.ans) {
+    score++;
+    document.getElementById('opt'+idx).classList.add('correct');
+    fb.className = 'feedback correct'; fb.innerHTML = '✅ Benar! ' + q.exp;
+  } else {
+    document.getElementById('opt'+idx).classList.add('wrong');
+    document.getElementById('opt'+q.ans).classList.add('correct');
+    fb.className = 'feedback wrong'; fb.innerHTML = '❌ Kurang tepat. ' + q.exp;
+  }
+  fb.style.display = 'block';
+  document.getElementById('btnNext').style.display = 'block';
+}
+
+function nextQ() {
+  cQ++; answered = false;
+  if (cQ >= cQuiz.length) showResult();
+  else renderQ();
+}
+
+function showResult() {
+  const xp = score * 30 + (score === cQuiz.length ? 50 : 0);
+  const pct = Math.round((score / cQuiz.length) * 100);
+  const icon = pct >= 80 ? '🏆' : pct >= 60 ? '⭐' : '📚';
+  const msg = pct >= 80 ? 'Luar Biasa!' : pct >= 60 ? 'Bagus! Terus berlatih!' : 'Jangan menyerah!';
+  document.getElementById('quizContent').innerHTML = `
+    <div class="result-screen">
+      <div class="result-icon">${icon}</div>
+      <div class="result-title">${msg}</div>
+      <div class="result-sub">Benar ${score} dari ${cQuiz.length} soal (${pct}%)</div>
+      <div class="result-xp">+${xp} XP <span>ditambahkan ke akunmu</span></div>
+      <button class="btn-close-result" onclick="closeQuiz()">Kembali ke Misi</button>
+    </div>`;
+}
+
+function closeQuiz() {
+  document.getElementById('quizModal').classList.remove('show');
+}
+
+document.getElementById('quizModal').addEventListener('click', function(e) {
+  if (e.target === this) closeQuiz();
+});
+</script>
+</body>
+</html>
